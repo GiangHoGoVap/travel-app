@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,23 +16,29 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
-import places from '../../consts/places';
-import regions from '../../consts/regions';
+import sanityClient, { urlFor } from '../../../client';
 
-const {width} = Dimensions.get('screen');
+const { width } = Dimensions.get('screen');
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const categoryIcons = [
     <Foundation name="mountains" size={25} color="#04555c" />,
     <Icon name="beach-access" size={25} color="#04555c" />,
-    <MaterialCommunityIcons
-      name="brightness-percent"
-      size={25}
-      color="#04555c"
-    />,
+    <MaterialCommunityIcons name="brightness-percent" size={25} color="#04555c" />,
     <Icon name="near-me" size={25} color="#04555c" />,
   ];
-
+  const [places, setPlaces] = useState([]);
+  useEffect(() => {
+    sanityClient
+      .fetch(
+        `
+    *[_type == 'place']{ details, image, location,
+      name, price}`
+      )
+      .then((data) => {
+        setPlaces(data);
+      });
+  }, []);
   const ListCategories = () => {
     return (
       <View style={styles.categoryContainer}>
@@ -46,20 +52,28 @@ const HomeScreen = ({navigation}) => {
   };
 
   const ListRegions = () => {
+    const [regions, setRegions] = useState([]);
+    useEffect(() => {
+      sanityClient.fetch(`*[_type == 'region']{ image, name, places[]-> }`).then((data) => {
+        setRegions(data);
+      });
+    }, []);
     return (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesListContainer}>
+        contentContainerStyle={styles.categoriesListContainer}
+      >
         {regions.map((region, index) => (
           <TouchableOpacity
             key={index}
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('RegionDetailsScreen', region)}>
+            onPress={() => navigation.navigate('RegionDetailsScreen', region)}
+          >
             <View style={styles.categoryBtn}>
               <View style={styles.categoryBtnImgCon}>
                 <Image
-                  source={region.image}
+                  source={{ uri: urlFor(region.image).url() }}
                   style={{
                     height: 35,
                     width: 35,
@@ -74,7 +88,8 @@ const HomeScreen = ({navigation}) => {
                   fontWeight: 'bold',
                   marginLeft: 10,
                   color: 'white',
-                }}>
+                }}
+              >
                 {region.name}
               </Text>
             </View>
@@ -84,19 +99,21 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
-  const Card = ({place}) => {
+  const Card = ({ place }) => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('DetailsScreen', place)}>
-        <ImageBackground style={styles.cardImage} source={place.image}>
+        onPress={() => navigation.navigate('DetailsScreen', place)}
+      >
+        <ImageBackground style={styles.cardImage} source={{ uri: urlFor(place.image).url() }}>
           <Text
             style={{
               color: 'white',
               fontSize: 20,
               fontWeight: 'bold',
               marginTop: 10,
-            }}>
+            }}
+          >
             {place.name}
           </Text>
           <View
@@ -105,16 +122,15 @@ const HomeScreen = ({navigation}) => {
               justifyContent: 'space-between',
               flexDirection: 'row',
               alignItems: 'flex-end',
-            }}>
-            <View style={{flexDirection: 'row'}}>
+            }}
+          >
+            <View style={{ flexDirection: 'row' }}>
               <Icon name="place" size={20} color="white" />
-              <Text style={{marginLeft: 5, color: 'white'}}>
-                {place.location}
-              </Text>
+              <Text style={{ marginLeft: 5, color: 'white' }}>{place.location}</Text>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <Icon name="star" size={20} color="#f5a623" />
-              <Text style={{marginLeft: 5, color: 'white'}}>5.0</Text>
+              <Text style={{ marginLeft: 5, color: 'white' }}>5.0</Text>
             </View>
           </View>
         </ImageBackground>
@@ -122,16 +138,17 @@ const HomeScreen = ({navigation}) => {
     );
   };
 
-  const RecommendedCard = ({place}) => {
+  const RecommendedCard = ({ place }) => {
     return (
-      <ImageBackground style={styles.rmCardImage} source={place.image}>
+      <ImageBackground style={styles.rmCardImage} source={{ uri: urlFor(place.image).url() }}>
         <Text
           style={{
             color: 'white',
             fontSize: 22,
             fontWeight: 'bold',
             marginTop: 10,
-          }}>
+          }}
+        >
           {place.name}
         </Text>
         <View
@@ -139,27 +156,26 @@ const HomeScreen = ({navigation}) => {
             flex: 1,
             justifyContent: 'space-between',
             alignItems: 'flex-end',
-          }}>
-          <View style={{width: '100%', flexDirection: 'row', marginTop: 10}}>
-            <View style={{flexDirection: 'row'}}>
+          }}
+        >
+          <View style={{ width: '100%', flexDirection: 'row', marginTop: 10 }}>
+            <View style={{ flexDirection: 'row' }}>
               <Icon name="place" size={22} color="white" />
-              <Text style={{color: 'white', marginLeft: 5}}>
-                {place.location}
-              </Text>
+              <Text style={{ color: 'white', marginLeft: 5 }}>{place.location}</Text>
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
               <Icon name="star" size={22} color="#f5a623" />
-              <Text style={{color: 'white', marginLeft: 5}}>5.0</Text>
+              <Text style={{ color: 'white', marginLeft: 5 }}>5.0</Text>
             </View>
           </View>
-          <Text style={{color: 'white', fontSize: 13}}>{place.details}</Text>
+          <Text style={{ color: 'white', fontSize: 13 }}>{place.details}</Text>
         </View>
       </ImageBackground>
     );
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar translucent={false} backgroundColor="#04555c" />
       <View style={styles.header}>
         <Icon name="sort" size={28} color="white" />
@@ -171,13 +187,14 @@ const HomeScreen = ({navigation}) => {
             backgroundColor: '#04555c',
             height: 120,
             paddingHorizontal: 20,
-          }}>
-          <View style={{flex: 1}}>
+          }}
+        >
+          <View style={{ flex: 1 }}>
             <Text style={styles.headerTitle}>Explore the</Text>
             <Text style={styles.headerTitle}>beautiful places</Text>
             <View style={styles.inputContainer}>
               <Icon name="search" size={28} />
-              <TextInput placeholder="Search place" style={{color: 'black'}} />
+              <TextInput placeholder="Search place" style={{ color: 'black' }} />
             </View>
           </View>
         </View>
@@ -187,20 +204,20 @@ const HomeScreen = ({navigation}) => {
         <Text style={styles.sectionTitle}>Places</Text>
         <View>
           <FlatList
-            contentContainerStyle={{paddingLeft: 20}}
+            contentContainerStyle={{ paddingLeft: 20 }}
             horizontal
             showsHorizontalScrollIndicator={false}
             data={places}
-            renderItem={({item}) => <Card place={item} />}
+            renderItem={({ item }) => <Card place={item} />}
           />
           <Text style={styles.sectionTitle}>Recommended</Text>
           <FlatList
             snapToInterval={width - 20}
-            contentContainerStyle={{paddingLeft: 20, paddingBottom: 20}}
+            contentContainerStyle={{ paddingLeft: 20, paddingBottom: 20 }}
             showsHorizontalScrollIndicator={false}
             horizontal
             data={places}
-            renderItem={({item}) => <RecommendedCard place={item} />}
+            renderItem={({ item }) => <RecommendedCard place={item} />}
           />
         </View>
       </ScrollView>
@@ -231,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     alignItems: 'center',
-    shadowOffset: {width: 5, height: 5},
+    shadowOffset: { width: 5, height: 5 },
     shadowColor: '#dddedd',
     shadowOpacity: 1,
     elevation: 12,

@@ -1,40 +1,22 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ImageBackground,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
+import { View, StyleSheet, ImageBackground, StatusBar, Text, TouchableOpacity } from 'react-native';
 
-const OnBoardScreen = ({navigation}) => {
+const OnBoardScreen = ({ navigation }) => {
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
-      <ImageBackground
-        style={{flex: 1}}
-        source={require('../../assets/onboardImage.jpeg')}>
+      <ImageBackground style={{ flex: 1 }} source={require('../../assets/onboardImage.jpeg')}>
         <View style={style.details}>
-          <Text style={{color: 'white', fontSize: 35, fontWeight: 'bold'}}>
-            Discover
+          <Text style={{ color: 'white', fontSize: 35, fontWeight: 'bold' }}>Discover</Text>
+          <Text style={{ color: 'white', fontSize: 35, fontWeight: 'bold' }}>Vietnam with us</Text>
+          <Text style={{ color: 'white', lineHeight: 25, marginTop: 15 }}>
+            Vietnam has fully reopened for international tourism without any Covid-19 restrictions.
+            Now you are free to discover and enjoy various wild nature destinations. Holiday is
+            coming, let’s get away from it all.
           </Text>
-          <Text style={{color: 'white', fontSize: 35, fontWeight: 'bold'}}>
-            Vietnam with us
-          </Text>
-          <Text style={{color: 'white', lineHeight: 25, marginTop: 15}}>
-            Vietnam has fully reopened for international tourism without any
-            Covid-19 restrictions. Now you are free to discover and enjoy
-            various wild nature destinations. Holiday is coming, let’s get away
-            from it all.
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('Home')}>
             <View style={style.btn}>
-              <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-                Get Started
-              </Text>
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Get Started</Text>
             </View>
           </TouchableOpacity>
         </View>
