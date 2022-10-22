@@ -1,27 +1,16 @@
 import React from 'react';
-import {
-  ImageBackground,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  View,
-  Text,
-} from 'react-native';
+import { ImageBackground, SafeAreaView, StatusBar, StyleSheet, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { urlFor } from '../../../client';
 
-const DetailsScreen = ({navigation, route}) => {
+const DetailsScreen = ({ navigation, route }) => {
   const place = route.params;
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
-      <ImageBackground style={{flex: 0.7}} source={place.image}>
+      <ImageBackground style={{ flex: 0.7 }} source={{ uri: urlFor(place.image).url() }}>
         <View style={styles.header}>
-          <Icon
-            name="arrow-back-ios"
-            size={28}
-            color="white"
-            onPress={navigation.goBack}
-          />
+          <Icon name="arrow-back-ios" size={28} color="white" onPress={navigation.goBack} />
           <Icon name="more-vert" size={28} color="white" />
         </View>
         <View style={styles.imageDetails}>
@@ -32,14 +21,13 @@ const DetailsScreen = ({navigation, route}) => {
               fontWeight: 'bold',
               color: 'white',
               marginBottom: 20,
-            }}>
+            }}
+          >
             {place.name}
           </Text>
-          <View style={{flexDirection: 'row'}}>
+          <View style={{ flexDirection: 'row' }}>
             <Icon name="star" size={30} color="#f5a623" />
-            <Text style={{color: 'white', fontWeight: 'bold', fontSize: 20}}>
-              5.0
-            </Text>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>5.0</Text>
           </View>
         </View>
       </ImageBackground>
@@ -47,7 +35,7 @@ const DetailsScreen = ({navigation, route}) => {
         <View style={styles.iconContainer}>
           <Icon name="favorite" color="red" size={30} />
         </View>
-        <View style={{flexDirection: 'row', marginTop: 10}}>
+        <View style={{ flexDirection: 'row', marginTop: 10 }}>
           <Icon name="place" size={28} color="#04555c" />
           <Text
             style={{
@@ -55,23 +43,23 @@ const DetailsScreen = ({navigation, route}) => {
               fontSize: 20,
               fontWeight: 'bold',
               color: '#04555c',
-            }}>
+            }}
+          >
             {place.location}
           </Text>
         </View>
-        <Text style={{marginTop: 20, fontWeight: 'bold', fontSize: 20}}>
-          About the trip
-        </Text>
-        <Text style={{marginTop: 20, lineHeight: 22}}>{place.details}</Text>
+        <Text style={{ marginTop: 20, fontWeight: 'bold', fontSize: 20 }}>About the trip</Text>
+        <Text style={{ marginTop: 20, lineHeight: 22 }}>{place.details}</Text>
       </View>
       <View style={styles.footer}>
-        <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <Text
             style={{
               fontSize: 16,
               fontWeight: 'bold',
               color: 'white',
-            }}>
+            }}
+          >
             {place.price}
           </Text>
           <Text
@@ -80,14 +68,13 @@ const DetailsScreen = ({navigation, route}) => {
               fontWeight: 'bold',
               color: '#dddedd',
               marginLeft: 2,
-            }}>
+            }}
+          >
             /PER PERSON
           </Text>
         </View>
         <View style={styles.bookNowBtn}>
-          <Text style={{color: '#04555c', fontSize: 16, fontWeight: 'bold'}}>
-            Book Now
-          </Text>
+          <Text style={{ color: '#04555c', fontSize: 16, fontWeight: 'bold' }}>Book Now</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -112,7 +99,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 30,
     right: 20,
-    shadowOffset: {width: 5, height: 5},
+    shadowOffset: { width: 5, height: 5 },
     shadowColor: '#dddedd',
     shadowOpacity: 1,
     elevation: 10,

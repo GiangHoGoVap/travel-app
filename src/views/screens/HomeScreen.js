@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,8 +16,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
-import places from '../../consts/places';
-import regions from '../../consts/regions';
+import sanityClient, { urlFor } from '../../../client';
 
 const { width } = Dimensions.get('screen');
 
@@ -28,7 +27,18 @@ const HomeScreen = ({ navigation }) => {
     <MaterialCommunityIcons name="brightness-percent" size={25} color="#04555c" />,
     <Icon name="near-me" size={25} color="#04555c" />,
   ];
-
+  const [places, setPlaces] = useState([]);
+  useEffect(() => {
+    sanityClient
+      .fetch(
+        `
+    *[_type == 'place']{ details, image, location,
+      name, price}`
+      )
+      .then((data) => {
+        setPlaces(data);
+      });
+  }, []);
   const ListCategories = () => {
     return (
       <View style={styles.categoryContainer}>
@@ -42,6 +52,12 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const ListRegions = () => {
+    const [regions, setRegions] = useState([]);
+    useEffect(() => {
+      sanityClient.fetch(`*[_type == 'region']{ image, name, places[]-> }`).then((data) => {
+        setRegions(data);
+      });
+    }, []);
     return (
       <ScrollView
         horizontal
@@ -57,7 +73,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.categoryBtn}>
               <View style={styles.categoryBtnImgCon}>
                 <Image
-                  source={region.image}
+                  source={{ uri: urlFor(region.image).url() }}
                   style={{
                     height: 35,
                     width: 35,
@@ -89,7 +105,7 @@ const HomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
         onPress={() => navigation.navigate('DetailsScreen', place)}
       >
-        <ImageBackground style={styles.cardImage} source={place.image}>
+        <ImageBackground style={styles.cardImage} source={{ uri: urlFor(place.image).url() }}>
           <Text
             style={{
               color: 'white',
@@ -124,7 +140,7 @@ const HomeScreen = ({ navigation }) => {
 
   const RecommendedCard = ({ place }) => {
     return (
-      <ImageBackground style={styles.rmCardImage} source={place.image}>
+      <ImageBackground style={styles.rmCardImage} source={{ uri: urlFor(place.image).url() }}>
         <Text
           style={{
             color: 'white',
