@@ -6,18 +6,22 @@ import OnBoardScreen from './src/views/screens/OnBoardScreen';
 import DetailsScreen from './src/views/screens/DetailsScreen';
 import RegionDetailsScreen from './src/views/screens/RegionDetailsScreen';
 import BottomNavigator from './src/views/navigation/BottomNavigator';
+import { Provider } from 'react-redux';
+import { store } from './src/store';
 
 const Stack = createStackNavigator();
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="OnBoardScreen" component={OnBoardScreen} />
-        <Stack.Screen name="Home" component={BottomNavigator} />
-        <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
-        <Stack.Screen name="RegionDetailsScreen" component={RegionDetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="OnBoardScreen" component={OnBoardScreen} />
+          <Stack.Screen name="Home" component={BottomNavigator} />
+          <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+          <Stack.Screen name="RegionDetailsScreen" component={RegionDetailsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 };
 
