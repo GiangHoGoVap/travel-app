@@ -33,7 +33,7 @@ const HomeScreen = ({ navigation }) => {
       .fetch(
         `
     *[_type == 'place']{ details, image, location,
-      name, price}`
+      name, price, _id}`
       )
       .then((data) => {
         setPlaces(data);

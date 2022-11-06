@@ -1,17 +1,52 @@
-import React from 'react';
-import { ImageBackground, SafeAreaView, StatusBar, StyleSheet, View, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  ImageBackground,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useDispatch, useSelector } from 'react-redux';
 import { urlFor } from '../../../client';
+import { addToBasket, selectBasketItems } from '../../slices/orderSlice';
 
 const DetailsScreen = ({ navigation, route }) => {
   const place = route.params;
+  const dispatch = useDispatch();
+  const items = useSelector(selectBasketItems);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <StatusBar translucent backgroundColor="rgba(0,0,0,0)" />
       <ImageBackground style={{ flex: 0.7 }} source={{ uri: urlFor(place.image).url() }}>
         <View style={styles.header}>
           <Icon name="arrow-back-ios" size={28} color="white" onPress={navigation.goBack} />
-          <Icon name="more-vert" size={28} color="white" />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: 60,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('BasketScreen');
+              }}
+            >
+              {items.length !== 0 && (
+                <View style={styles.shoppingCart}>
+                  <Text style={{ color: 'white', fontWeight: '700', fontSize: 16 }}>
+                    {items.length}
+                  </Text>
+                </View>
+              )}
+              <Icon name="shopping-cart" size={28} color="white" />
+            </TouchableOpacity>
+            <Icon name="more-vert" size={28} color="white" />
+          </View>
         </View>
         <View style={styles.imageDetails}>
           <Text
@@ -73,9 +108,14 @@ const DetailsScreen = ({ navigation, route }) => {
             /PER PERSON
           </Text>
         </View>
-        <View style={styles.bookNowBtn}>
+        <TouchableOpacity
+          style={styles.bookNowBtn}
+          onPress={() => {
+            dispatch(addToBasket(place));
+          }}
+        >
           <Text style={{ color: '#04555c', fontSize: 16, fontWeight: 'bold' }}>Book Now</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -139,6 +179,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
+  },
+  shoppingCart: {
+    backgroundColor: '#FF6347',
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    zIndex: 10,
+    borderWidth: 2,
+    borderColor: 'white',
+    top: -13,
+    right: -4,
   },
 });
 
