@@ -8,6 +8,7 @@ import RegionDetailsScreen from './src/views/screens/RegionDetailsScreen';
 import BottomNavigator from './src/views/navigation/BottomNavigator';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
+import BasketScreen from './src/views/screens/BasketScreen';
 
 const Stack = createStackNavigator();
 const App = () => {
@@ -19,6 +20,11 @@ const App = () => {
           <Stack.Screen name="Home" component={BottomNavigator} />
           <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
           <Stack.Screen name="RegionDetailsScreen" component={RegionDetailsScreen} />
+          <Stack.Screen
+            name="BasketScreen"
+            component={BasketScreen}
+            options={{ presentation: 'modal', headerShown: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
