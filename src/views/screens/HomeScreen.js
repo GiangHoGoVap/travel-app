@@ -18,6 +18,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Foundation from 'react-native-vector-icons/Foundation';
 import { UserIcon } from 'react-native-heroicons/outline';
 import sanityClient, { urlFor } from '../../../client';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('screen');
 
@@ -140,6 +141,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const RecommendedCard = ({ place }) => {
+    const navigation = useNavigation();
     return (
       <ImageBackground style={styles.rmCardImage} source={{ uri: urlFor(place.image).url() }}>
         <Text
@@ -182,7 +184,11 @@ const HomeScreen = ({ navigation }) => {
         <Icon name="sort" size={28} color="white" />
         <View style={styles.loginIconsGroup}>
           <Icon name="notifications-none" size={28} color="white" />
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('LoginScreen');
+            }}
+          >
             <UserIcon size={28} color="white" />
           </TouchableOpacity>
         </View>

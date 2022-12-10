@@ -10,23 +10,17 @@ import {
 import React from 'react';
 import { useState } from 'react';
 import auth from '@react-native-firebase/auth';
-import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
   const [email, onChangeEmail] = useState('');
   const [password, onChangePassword] = useState('');
+  const [confirmedPassword, onChangeConfirmedPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <TouchableOpacity
-        style={styles.backIcon}
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        <ArrowLeftIcon color="black" />
-      </TouchableOpacity>
-      <Image source={require('../../assets/login_image.png')} style={styles.loginImage} />
+      <Text style={styles.slogan}>Discover Vietnam with us</Text>
+      <Image source={require('../../assets/register_image.jpg')} style={styles.registerImage} />
+
       <TextInput
         placeholder="Email"
         keyboardType="email-address"
@@ -43,39 +37,56 @@ const LoginScreen = ({ navigation }) => {
         autoCapitalize="none"
         value={password}
       />
+      <TextInput
+        placeholder="Confirm passsword"
+        style={styles.textInput}
+        secureTextEntry
+        onChangeText={onChangeConfirmedPassword}
+        autoCapitalize="none"
+        value={confirmedPassword}
+      />
       <View style={styles.errorView}>
         <Text style={styles.errorText}>{errorMessage}</Text>
       </View>
       <TouchableOpacity
-        style={styles.loginButton}
+        style={styles.registerButton}
         onPress={() => {
+          if (password !== confirmedPassword) {
+            setErrorMessage('Please type your confirm password again!');
+            return;
+          }
           auth()
-            .signInWithEmailAndPassword(email, password)
+            .createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
               navigation.navigate('Home');
             })
             .catch((error) => {
-              const errorCode = error.code;
               setErrorMessage(error.message);
             });
         }}
       >
-        <Text style={styles.loginText}>Login</Text>
+        <Text style={styles.registerText}>Register</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('RegisterScreen');
+          navigation.navigate('Home');
         }}
       >
-        <Text style={styles.registerText}>Register</Text>
+        <Text style={styles.annonymousText}>Continue as Annonymous</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
+  slogan: {
+    color: '#04555c',
+    fontWeight: 'bold',
+    fontSize: 25,
+    marginTop: 20,
+  },
   backIcon: {
     position: 'absolute',
     top: 70,
@@ -86,10 +97,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
   },
-  loginImage: {
-    width: 200,
+  registerImage: {
+    width: 330,
     height: 200,
-    marginTop: 40,
+    marginTop: 20,
+    marginBottom: 20,
   },
   textInput: {
     width: '75%',
@@ -101,7 +113,7 @@ const styles = StyleSheet.create({
     borderColor: '#04555c',
     borderWidth: 0.5,
   },
-  loginButton: {
+  registerButton: {
     width: '75%',
     height: 45,
     backgroundColor: '#04555c',
@@ -109,13 +121,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
-  loginText: {
+  registerText: {
     textAlign: 'center',
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  registerText: {
+  annonymousText: {
     color: '#04555c',
     fontSize: 18,
     fontWeight: 'bold',
