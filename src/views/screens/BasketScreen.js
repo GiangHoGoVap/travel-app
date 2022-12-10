@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { XCircleIcon } from 'react-native-heroicons/outline';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFromBasket, selectBasketItems, selectBasketTotal } from '../../slices/orderSlice';
-import Currency from 'react-currency-formatter';
+import CurrencyFormat from 'react-currency-format';
 import { urlFor } from '../../../client';
 
 const BasketScreen = ({ navigation }) => {
@@ -56,7 +56,7 @@ const BasketScreen = ({ navigation }) => {
                 {items[0]?.name}
               </Text>
               <Text className="text-gray-600" style={styles.itemPrice}>
-                <Currency quantity={items[0]?.price} currency="VND" pattern="##,### !" />
+                <CurrencyFormat value={items[0]?.price} prefix="đ" pattern="##,### !" />
               </Text>
               <TouchableOpacity>
                 <Text
@@ -77,7 +77,7 @@ const BasketScreen = ({ navigation }) => {
         >
           <Text style={{ fontSize: 17, color: '#9ca3af' }}>Subtotal</Text>
           <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <Currency quantity={basketTotal} currency="VND" pattern="##,### !" />
+            <CurrencyFormat value={basketTotal} prefix="đ" pattern="##,### !" />
           </Text>
         </View>
         <View
@@ -90,7 +90,7 @@ const BasketScreen = ({ navigation }) => {
         >
           <Text style={{ fontSize: 17, color: '#9ca3af' }}>Coupon reduced</Text>
           <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <Currency quantity={couponReduced} currency="VND" pattern="##,### !" />
+            <CurrencyFormat value={couponReduced} prefix="đ" pattern="##,### !" />
           </Text>
         </View>
         <View
@@ -103,7 +103,7 @@ const BasketScreen = ({ navigation }) => {
         >
           <Text style={{ fontSize: 17, fontWeight: '700' }}>Order Total</Text>
           <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <Currency quantity={basketTotal - couponReduced} currency="VND" pattern="##,### !" />
+            <CurrencyFormat value={basketTotal - couponReduced} prefix="đ" pattern="##,### !" />
           </Text>
         </View>
         <TouchableOpacity style={styles.paymentButton}>
