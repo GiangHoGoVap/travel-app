@@ -16,6 +16,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Foundation from 'react-native-vector-icons/Foundation';
+import { UserIcon } from 'react-native-heroicons/outline';
 import sanityClient, { urlFor } from '../../../client';
 
 const { width } = Dimensions.get('screen');
@@ -179,7 +180,12 @@ const HomeScreen = ({ navigation }) => {
       <StatusBar translucent={false} backgroundColor="#04555c" />
       <View style={styles.header}>
         <Icon name="sort" size={28} color="white" />
-        <Icon name="notifications-none" size={28} color="white" />
+        <View style={styles.loginIconsGroup}>
+          <Icon name="notifications-none" size={28} color="white" />
+          <TouchableOpacity>
+            <UserIcon size={28} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
@@ -310,6 +316,12 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loginIconsGroup: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '18%',
   },
 });
 
