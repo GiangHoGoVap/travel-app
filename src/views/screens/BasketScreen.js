@@ -1,12 +1,15 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { XCircleIcon } from 'react-native-heroicons/outline';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFromBasket, selectBasketItems, selectBasketTotal } from '../../slices/orderSlice';
-import CurrencyFormat from 'react-currency-format';
 import { urlFor } from '../../../client';
+import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
+import { PUBLISHABLE_KEY } from '../../credentials';
 
+const API_URL = 'http://localhost:8888';
 const BasketScreen = ({ navigation }) => {
+  // const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const items = useSelector(selectBasketItems);
   const basketTotal = useSelector(selectBasketTotal);
   const [groupedItemsInBasket, setgroupedItemsInBasket] = useState([]);
@@ -23,96 +26,141 @@ const BasketScreen = ({ navigation }) => {
     }, {});
     setgroupedItemsInBasket(groupedItems);
   }, [items]);
+  useEffect(() => {
+    initializePaymentSheet();
+  }, []);
+  const { initPaymentSheet, presentPaymentSheet, loading } = useStripe();
+  const [ready, setReady] = useState(false);
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch(`${API_URL}/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: basketTotal / 24000 }),
+    }).catch((e) => {
+      console.log('The error is ', e.message);
+    });
+
+    const { paymentIntent } = await response.json();
+
+    return {
+      paymentIntent,
+    };
+  };
+  const initializePaymentSheet = async () => {
+    const { paymentIntent } = await fetchPaymentSheetParams();
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: 'Travel Application',
+      paymentIntentClientSecret: paymentIntent,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: true,
+    });
+    if (!error) {
+      setReady(true);
+    } else {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    }
+  };
+  async function payment() {
+    const { error } = await presentPaymentSheet();
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      navigation.navigate('PaymentSuccessScreen');
+      setReady(false);
+    }
+  }
   return (
-    <View style={styles.basketScreenContainer}>
-      <View style={styles.header}>
-        <Text style={{ fontSize: 20, fontWeight: '700' }}>Basket</Text>
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        >
-          <XCircleIcon color="black" size={30} />
-        </TouchableOpacity>
-      </View>
-      <ScrollView style={styles.scrollView}>
-        {Object.entries(groupedItemsInBasket).map(([key, items]) => {
-          return (
-            <View
-              key={key}
-              className="flex-row items-center space-x-3 bg-white py-2 px-5"
-              style={styles.itemRow}
-            >
-              <Text className="text-[#00CCBB]" style={styles.itemQuantity}>
-                {items.length} x
-              </Text>
-              <Image
-                source={{ uri: urlFor(items[0]?.image).url() }}
-                className="h-12 w-12 rounded-full"
-                style={styles.itemImage}
-              />
-              <Text className="flex-1" style={styles.itemName}>
-                {items[0]?.name}
-              </Text>
-              <Text className="text-gray-600" style={styles.itemPrice}>
-                <CurrencyFormat value={items[0]?.price} prefix="đ" pattern="##,### !" />
-              </Text>
-              <TouchableOpacity>
-                <Text
-                  className="text-[#00CCBB] text-xs"
-                  style={styles.removeText}
-                  onPress={() => dispatch(removeFromBasket({ _id: key }))}
-                >
-                  Remove
+    <StripeProvider publishableKey={PUBLISHABLE_KEY}>
+      <View style={styles.basketScreenContainer}>
+        <View style={styles.header}>
+          <Text style={{ fontSize: 20, fontWeight: '700' }}>Basket</Text>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          >
+            <XCircleIcon color="black" size={30} />
+          </TouchableOpacity>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          {Object.entries(groupedItemsInBasket).map(([key, items]) => {
+            return (
+              <View
+                key={key}
+                className="flex-row items-center space-x-3 bg-white py-2 px-5"
+                style={styles.itemRow}
+              >
+                <Text className="text-[#00CCBB]" style={styles.itemQuantity}>
+                  {items.length} x
                 </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
-      <View style={styles.totalView}>
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          <Text style={{ fontSize: 17, color: '#9ca3af' }}>Subtotal</Text>
-          <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <CurrencyFormat value={basketTotal} prefix="đ" pattern="##,### !" />
-          </Text>
+                <Image
+                  source={{ uri: urlFor(items[0]?.image).url() }}
+                  className="h-12 w-12 rounded-full"
+                  style={styles.itemImage}
+                />
+                <Text className="flex-1" style={styles.itemName}>
+                  {items[0]?.name}
+                </Text>
+                <Text className="text-gray-600" style={styles.itemPrice}>
+                  {items[0]?.price} đ
+                </Text>
+                <TouchableOpacity>
+                  <Text
+                    className="text-[#00CCBB] text-xs"
+                    style={styles.removeText}
+                    onPress={() => dispatch(removeFromBasket({ _id: key }))}
+                  >
+                    Remove
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+        <View style={styles.totalView}>
+          <View
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <Text style={{ fontSize: 17, color: '#9ca3af' }}>Subtotal</Text>
+            <Text style={{ fontSize: 17, color: '#9ca3af' }}>{basketTotal} đ</Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 20,
+            }}
+          >
+            <Text style={{ fontSize: 17, color: '#9ca3af' }}>Coupon reduced</Text>
+            <Text style={{ fontSize: 17, color: '#9ca3af' }}>{couponReduced} đ</Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 20,
+            }}
+          >
+            <Text style={{ fontSize: 17, fontWeight: '700' }}>Order Total</Text>
+            <Text style={{ fontSize: 17, color: '#9ca3af' }}>
+              {/* <CurrencyFormat value={basketTotal - couponReduced} prefix="đ" pattern="##,### !" /> */}
+              {basketTotal - couponReduced > 0 ? basketTotal - couponReduced : 0} đ
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.paymentButton} onPress={payment}>
+            <Text style={{ color: 'white', fontSize: 20, fontWeight: '600' }}>
+              Process to Payment
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ fontSize: 17, color: '#9ca3af' }}>Coupon reduced</Text>
-          <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <CurrencyFormat value={couponReduced} prefix="đ" pattern="##,### !" />
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginTop: 20,
-          }}
-        >
-          <Text style={{ fontSize: 17, fontWeight: '700' }}>Order Total</Text>
-          <Text style={{ fontSize: 17, color: '#9ca3af' }}>
-            <CurrencyFormat value={basketTotal - couponReduced} prefix="đ" pattern="##,### !" />
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.paymentButton}>
-          <Text style={{ color: 'white', fontSize: 20, fontWeight: '600' }}>
-            Process to Payment
-          </Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </StripeProvider>
   );
 };
 

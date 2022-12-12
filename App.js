@@ -11,6 +11,7 @@ import { store } from './src/store';
 import BasketScreen from './src/views/screens/BasketScreen';
 import LoginScreen from './src/views/screens/LoginScreen';
 import RegisterScreen from './src/views/screens/RegisterScreen';
+import PaymentSuccessScreen from './src/views/screens/PaymentSuccessScreen';
 
 const Stack = createStackNavigator();
 const App = () => {
@@ -33,6 +34,14 @@ const App = () => {
           <Stack.Screen
             name="RegisterScreen"
             component={RegisterScreen}
+            options={{
+              presentation: 'fullScreenModal',
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="PaymentSuccessScreen"
+            component={PaymentSuccessScreen}
             options={{
               presentation: 'fullScreenModal',
               headerShown: false,

@@ -95,7 +95,7 @@ const DetailsScreen = ({ navigation, route }) => {
               color: 'white',
             }}
           >
-            {place.price}
+            {place.price} đ
           </Text>
           <Text
             style={{
