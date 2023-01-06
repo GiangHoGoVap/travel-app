@@ -70,7 +70,7 @@
 ## About The Project
 
 <div align="center">
-  <img src="src/assets/product_overview.gif" alt="Project overview" width="3%">
+  <img src="src/assets/product_overview.gif" alt="Project overview" width="30%">
 </div>
 
 ### Built With
