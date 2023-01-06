@@ -70,9 +70,7 @@
 ## About The Project
 
 <div align="center">
-<video width="50%" controls autoplay>
-  <source src="movie.mp4" type="video/mp4">
-</video>
+  <img src="src/assets/product_overview.gif" alt="Project overview" width="45%">
 </div>
 
 ### Built With
